@@ -12,8 +12,10 @@ const Geolocator = function(options) {
         cookieName: 'ev-locale',
         cookieDays: 90,
         container: '#geolocator-prompt',
-        dismiss: 'a[href="#dismiss"]',
+        continue: '.geolocator--continue',
+        dismiss: '.geolocator--dismiss',
         template: '#geolocator-template',
+        onContinue: null,
         onPrompt: null,
         onDismiss: null
     }, options);
@@ -134,6 +136,14 @@ const Geolocator = function(options) {
         if (config.onPrompt) {
             config.onPrompt.call(containerEl, locale);
         }
+
+        $(config.continue, containerEl).on('click', function(e) {
+            e.preventDefault();
+            if (config.onContinue) {
+                config.onContinue.call(containerEl, locale);
+            }
+            handleLocaleRedirect(locale);
+        });
 
         $(config.dismiss, containerEl).on('click', function(e) {
             e.preventDefault();

@@ -49,8 +49,8 @@ Next, add a JavaScript template:
 ```html
 <script id="geolocator-template" type="text/x-template">
     Visit our <%= countryName %> store in <%= currencyCode %>.
-    <a href="<%= url %>">Continue</a>
-    <a href="#dismiss">Stay</a>
+    <a href="<%= url %>" class="geolocator--continue">Continue</a>
+    <a href="#dismiss" class="geolocator--dismiss">Stay</a>
 </script>
 ```
 This allows control over the message, look and feel of the prompt.
@@ -99,9 +99,29 @@ const geolocator = new Geolocator({
 geolocator.prompt();
 ```
 
+### onContinue
+A user should be allowed to continue with the suggested locale from the prompt. This may differ depending on a user's
+previous preference, or a recommended locale based on the user's IP address and geo-targeting in Evance.
+By default, the script will look for any `.geolocator--continue` element within your container element. 
+When clicked the suggested locale is saved in the `ev-locale` cookie as a preference and then the user
+is redirected to the suggested locale. The class name expected is customisable by adding a `continue`
+selector to your config:
+
+```javascript
+const geolocator = new Geolocator({
+    continue: '#my-continue-button',
+    onContinue: function(locale) {
+        console.log(locale); // The suggested locale object
+        console.log(this); // The container element
+    }
+});
+geolocator.prompt();
+```
+
+
 ### onDismiss
 A user should be allowed to dismiss a suggested locale prompt. 
-By default, this script will look for a `<a href="#dismiss">` link within your container element,
+By default, this script will look for any `.geolocator--dismiss` element within your container element,
 which will empty the container when clicked. 
 However, you can customise this behaviour
 by adding a `dismiss` selector and/or `onDismiss` method to your config.
