@@ -42,13 +42,16 @@ const Geolocator = function(options) {
     }
 
     /**
-     * Send a POST request to the geolocate.json API.
+     * Send a POST request to the `geolocate.json` API.
      * This will return the recommended and preferred locale data.
+     *
+     * Note, geolocation is ignored if the user is in Evance's edit mode.
+     *
      * @return {void}
      */
     function geolocate(responseHandler) {
         // We only need to geolocate if we're not on our preferred locale already.
-        if (isCurrentLocale(getPreferredLocaleCode())) {
+        if (isEditMode() || isCurrentLocale(getPreferredLocaleCode())) {
             return;
         }
         $.post('/utils/geolocate.json', {
@@ -119,6 +122,17 @@ const Geolocator = function(options) {
      */
     function isCurrentLocale(localeCode) {
         return getCurrentLocaleCode() == localeCode;
+    }
+
+    /**
+     * Returns `true` if the browser is currently in Evance's edit mode.
+     */
+    function isEditMode() {
+        const editMode = $('meta[name="ev:editmode"]');
+        return (
+            editMode.length > 0
+            && window.self !== window.top
+        );
     }
 
     /**
