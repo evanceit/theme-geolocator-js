@@ -17,7 +17,8 @@ const Geolocator = function(options) {
         template: '#geolocator-template',
         onContinue: null,
         onPrompt: null,
-        onDismiss: null
+        onDismiss: null,
+        locales: 'a[data-locale]',
     }, options);
 
     /**
@@ -64,6 +65,26 @@ const Geolocator = function(options) {
             } else {
                 saveCurrentLocale();
             }
+        });
+    }
+
+    /**
+     * Listens to click events on locale menu items.
+     * This works in conjunction with the `config.locales` selector.
+     * Locale menu items should be anchor links with a `data-locale` attribute containing the the `locale.id`.
+     * The `href` of the locale link MUST be the locale's homepage (e.g. `/en-us`).
+     */
+    function handleLocaleMenu() {
+        document.querySelectorAll(config.locales).forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentPrefix = document.querySelector('meta[name="ev:locale:uri"]')?.getAttribute('content') || '';
+                const path = window.location.pathname.slice(currentPrefix.length);
+                handleLocaleRedirect({
+                    id: this.getAttribute('data-locale'),
+                    url: this.getAttribute('href') !== '/' ? this.getAttribute('href') + path : path
+                });
+            });
         });
     }
 
@@ -116,7 +137,8 @@ const Geolocator = function(options) {
      * @param {Object} locale
      */
     function saveLocale(locale) {
-        $.cookie(config.cookieName, locale.id, { expires: config.cookieDays, path: '/', secure: true });
+        const expires = config.cookieDays  * 24 * 60 * 60;
+        document.cookie = `${config.cookieName}=${locale.id}; path=/; max-age=${expires}; secure`;
     }
 
     /**
@@ -159,9 +181,14 @@ const Geolocator = function(options) {
     return {
         redirect: function() {
             geolocate(handleLocaleRedirect);
+            handleLocaleMenu();
         },
         prompt: function() {
             geolocate(handleLocalePrompt);
+            handleLocaleMenu();
+        },
+        locales: function() {
+            handleLocaleMenu();
         }
     };
 };

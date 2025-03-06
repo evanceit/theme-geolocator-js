@@ -83,11 +83,42 @@ const geolocator = new Geolocator();
 geolocator.redirect();
 ```
 
-## Configuration
-You may wish to customise what happens when the prompt shows or is dismissed. 
-You do this by supplying `onPrompt` and `onDismiss` functions to the construct.
+---
 
-### onPrompt
+## Configuration
+Configuration options may be passed to the Geolocator construct.
+
+### `container`
+The query selector for the Geolocator prompt container. Defaults to `#geolocator-prompt`.
+
+### `continue`
+The query selector representing the "continue to suggested locale" link within the Geolocator prompt.
+Defaults to `.geolocator--continue`.
+
+### `dismiss`
+The query selector representing the "dismiss, stay on current locale" link within the Geolocator prompt.
+Defaults to `.geolocator--dismiss`.
+
+### `locales`
+Represents a query selector for locale anchor links, typically within a locale menu.
+The anchor link MUST:
+- have a `data-locale` attribute containing the `locale.id` value.
+- the `href` attribute MUST be that of the locale's homepage (`locale.url`).
+
+Defaults to `a[data-locale]`.
+
+```html
+<a href="{{ locale.url }}" data-locale="{{ locale.id }}">
+    ...
+</a>
+```
+
+This allows the locales menu to integrate with the geolocator script, which listens to `click` events
+on each locale anchor. On click the geolocator script will set the `locale.id` as the preferred locale
+within the `ev-locale` cookie before redirecting the user to localized version of the current 
+path (`window.location.pathname`).
+
+### `onPrompt`
 Add your own functionality when a suggested locale prompt is shown.
 ```javascript
 const geolocator = new Geolocator({
@@ -99,7 +130,7 @@ const geolocator = new Geolocator({
 geolocator.prompt();
 ```
 
-### onContinue
+### `onContinue`
 A user should be allowed to continue with the suggested locale from the prompt. This may differ depending on a user's
 previous preference, or a recommended locale based on the user's IP address and geo-targeting in Evance.
 By default, the script will look for any `.geolocator--continue` element within your container element. 
@@ -119,7 +150,7 @@ geolocator.prompt();
 ```
 
 
-### onDismiss
+### `onDismiss`
 A user should be allowed to dismiss a suggested locale prompt. 
 By default, this script will look for any `.geolocator--dismiss` element within your container element,
 which will empty the container when clicked. 
@@ -135,6 +166,13 @@ const geolocator = new Geolocator({
 });
 geolocator.prompt();
 ```
+
+### `template`
+The query selector id of the JavaScript template for the geolocation prompt. 
+Defaults to `#geolocator-template`. Full information on the template and available variables
+are in the installation guide above. 
+
+---
 
 ## Minification
 Evance will automatically minify JavaScript included into themes.
